@@ -7,7 +7,11 @@ int my_strlen(char *str) {
      */
 
     // IMPLEMENT YOUR CODE HERE
-    return 0;
+    int len = 0;
+    while (str[len] != '\0') {
+        len++;
+    }
+    return len;
 }
 
 
@@ -19,6 +23,12 @@ void my_strcat(char *str_1, char *str_2) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+    int len_1 = my_strlen(str_1);
+    int len_2 = my_strlen(str_2);
+    for (int i = 0; i < len_2; i++) {
+        str_1[len_1 + i] = str_2[i];
+    }
+    str_1[len_1 + len_2] = '\0';
 }
 
 
@@ -31,6 +41,19 @@ char* my_strstr(char *s, char *p) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+    int len_s = my_strlen(s);
+    int len_p = my_strlen(p);
+    for (int i = 0; i <= len_s - len_p; i++) {
+        int j;
+        for (j = 0; j < len_p; j++) {
+            if (s[i + j] != p[j]) {
+                break;
+            }
+        }
+        if (j == len_p) {
+            return &s[i];
+        }
+    }
     return 0;
 }
 
@@ -96,6 +119,13 @@ void rgb2gray(float *in, float *out, int h, int w) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+    int total = h * w;
+    for(int i = 0; i < total; i++){
+        float B = in[3*i + 0];
+        float G = in[3*i + 1];
+        float R = in[3*i + 2];
+        out[i] = 0.1140 * B + 0.5870 * G + 0.2989 * R;
+    }
     // ...
 }
 
@@ -198,6 +228,39 @@ void resize(float *in, float *out, int h, int w, int c, float scale) {
 
     int new_h = h * scale, new_w = w * scale;
     // IMPLEMENT YOUR CODE HERE
+    for (int y = 0; y < new_h; y++) {
+        for (int x = 0; x < new_w; x++) {
+            float x0 = x / scale;
+            float y0 = y / scale;
+
+            int x1 = static_cast<int>(x0);
+            int y1 = static_cast<int>(y0);
+            int x2 = x1 + 1;
+            int y2 = y1 + 1;
+
+            if(x1 < 0) x1 = 0;
+            if(y1 < 0) y1 = 0;
+            if(x2 >= w) x2 = w - 1;
+            if(y2 >= h) y2 = h - 1;
+
+            float dx = x0 - x1;
+            float dy = y0 - y1;
+
+            for(int ch = 0; ch < c; ch++){
+                float P1 = in[ y1 * w * c + x1 * c + ch ];
+                float P2 = in[ y1 * w * c + x2 * c + ch ];
+                float P3 = in[ y2 * w * c + x1 * c + ch ];
+                float P4 = in[ y2 * w * c + x2 * c + ch ];
+
+                float val = P1 * (1-dx)*(1-dy)
+                          + P2 * dx*(1-dy)
+                          + P3 * (1-dx)*dy
+                          + P4 * dx*dy;
+
+                out[ y * new_w * c + x * c + ch ] = val;
+            }
+        }
+    }
 
 }
 
@@ -221,4 +284,8 @@ void hist_eq(float *in, int h, int w) {
      */
 
     // IMPLEMENT YOUR CODE HERE
+
 }
+
+
+
